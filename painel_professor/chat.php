@@ -25,7 +25,7 @@ $res_prof = $sql_prof->get_result();
 if ($res_prof->num_rows == 0) {
     die("Curso não encontrado.");
 }
-$professor_id = $res_prof->fetch_assoc()['professor_id'];
+$professor_id = $res_prof->fetch_assoc()['professor_id'] ?? null;
 
 // Salvar nova mensagem
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mensagem'])) {

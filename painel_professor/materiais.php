@@ -23,7 +23,7 @@ $sql_total_cursos = "SELECT COUNT(*) AS total FROM cursos WHERE professor_id=?";
 $stmt = $conn->prepare($sql_total_cursos);
 $stmt->bind_param("i", $professor_id);
 $stmt->execute();
-$total_cursos = $stmt->get_result()->fetch_assoc()['total'];
+$total_cursos = $stmt->get_result()->fetch_assoc()['total'] ?? 0;
 
 $sql_total_materiais = "SELECT COUNT(*) AS total FROM materiais m 
                         INNER JOIN cursos c ON m.curso_id = c.id 
@@ -31,7 +31,7 @@ $sql_total_materiais = "SELECT COUNT(*) AS total FROM materiais m
 $stmt = $conn->prepare($sql_total_materiais);
 $stmt->bind_param("i", $professor_id);
 $stmt->execute();
-$total_materiais = $stmt->get_result()->fetch_assoc()['total'];
+$total_materiais = $stmt->get_result()->fetch_assoc()['total'] ?? 0;
 
 $sql_total_alunos = "SELECT COUNT(*) AS total FROM inscricoes i 
                      JOIN cursos c ON i.curso_id = c.id 
@@ -39,14 +39,14 @@ $sql_total_alunos = "SELECT COUNT(*) AS total FROM inscricoes i
 $stmt = $conn->prepare($sql_total_alunos);
 $stmt->bind_param("i", $professor_id);
 $stmt->execute();
-$total_alunos = $stmt->get_result()->fetch_assoc()['total'];
+$total_alunos = $stmt->get_result()->fetch_assoc()['total'] ?? 0;
 
 $sql_notificacoes = "SELECT COUNT(*) AS nao_lidas FROM notificacoes 
                      WHERE destinatario_id=? AND lida=0";
 $stmt = $conn->prepare($sql_notificacoes);
 $stmt->bind_param("i", $professor_id);
 $stmt->execute();
-$notificacoes_nao_lidas = $stmt->get_result()->fetch_assoc()['nao_lidas'];
+$notificacoes_nao_lidas = $stmt->get_result()->fetch_assoc()['nao_lidas'] ?? 0;
 
 // ➕ Adicionar material
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add'])) {

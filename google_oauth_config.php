@@ -5,7 +5,6 @@
 define('GOOGLE_CLIENT_ID', '811725114546-sehu9p1qs8hdi5i81uui5vjo6efeff12.apps.googleusercontent.com');
 define('GOOGLE_CLIENT_SECRET', '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');
 define('GOOGLE_REDIRECT_URI', 'http://localhost/plantaforma/google_callback.php');
-
 // URL para iniciar o login
 define('GOOGLE_AUTH_URL', 'https://accounts.google.com/o/oauth2/auth');
 define('GOOGLE_TOKEN_URL', 'https://oauth2.googleapis.com/token');
@@ -25,7 +24,9 @@ function getGoogleLoginUrl($returnTo = 'register') {
         'redirect_uri' => GOOGLE_REDIRECT_URI,
         'response_type' => 'code',
         'scope' => 'openid email profile',
-        'state' => $state
+        'state' => $state,
+        'prompt' => 'select_account',  // Força sempre a tela de seleção de conta
+        'access_type' => 'offline'      // Permite refresh token se necessário
     ];
 
     return GOOGLE_AUTH_URL . '?' . http_build_query($params);

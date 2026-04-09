@@ -12,11 +12,11 @@ $admin_id = $_SESSION['usuario_id'];
 $nome_admin = $_SESSION['usuario_nome'] ?? "Administrador";
 
 // --- Estatísticas rápidas ---
-$totalAlunos = $conn->query("SELECT COUNT(*) as total FROM usuarios WHERE tipo='aluno'")->fetch_assoc()['total'];
-$totalProfessores = $conn->query("SELECT COUNT(*) as total FROM usuarios WHERE tipo='professor'")->fetch_assoc()['total'];
-$totalCursos = $conn->query("SELECT COUNT(*) as total FROM cursos")->fetch_assoc()['total'];
-$totalInscricoes = $conn->query("SELECT COUNT(*) as total FROM inscricoes")->fetch_assoc()['total'];
-$totalAulas = $conn->query("SELECT COUNT(*) as total FROM aulas")->fetch_assoc()['total'];
+$totalAlunos = $conn->query("SELECT COUNT(*) as total FROM usuarios WHERE tipo='aluno'")->fetch_assoc()['total'] ?? 0;
+$totalProfessores = $conn->query("SELECT COUNT(*) as total FROM usuarios WHERE tipo='professor'")->fetch_assoc()['total'] ?? 0;
+$totalCursos = $conn->query("SELECT COUNT(*) as total FROM cursos")->fetch_assoc()['total'] ?? 0;
+$totalInscricoes = $conn->query("SELECT COUNT(*) as total FROM inscricoes")->fetch_assoc()['total'] ?? 0;
+$totalAulas = $conn->query("SELECT COUNT(*) as total FROM aulas")->fetch_assoc()['total'] ?? 0;
 
 // --- Cursos com número de alunos inscritos ---
 $sql = "SELECT c.titulo, c.descricao, u.nome as professor, COUNT(i.aluno_id) as inscritos

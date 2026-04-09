@@ -11,7 +11,7 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $curso_id);
 $stmt->execute();
 $result = $stmt->get_result();
-$total_aulas = $result->fetch_assoc()['total_aulas'];
+$total_aulas = $result->fetch_assoc()['total_aulas'] ?? 0;
 
 $sql = "SELECT COUNT(*) AS aulas_concluidas FROM progresso WHERE aluno_id=? AND curso_id=?";
 $stmt = $conn->prepare($sql);

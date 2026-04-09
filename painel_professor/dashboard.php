@@ -1195,118 +1195,142 @@ document.querySelectorAll('.stat-card, .course-card, .chart-container, .empty-st
 const cursosNomes = <?php echo json_encode(array_column($cursos,'curso_nome')); ?>;
 const alunosQtd = <?php echo json_encode(array_map(fn($c)=>intval($c['total_alunos']), $cursos)); ?>;
 
-// Configurar gráfico se houver cursos
-if (cursosNomes.length > 0) {
-  const ctx = document.getElementById('chartCursos').getContext('2d');
-  
-  // Cores em gradiente azul
-  const blueGradients = [];
-  for (let i = 0; i < cursosNomes.length; i++) {
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    const opacity = 0.7 + (i * 0.1);
-    gradient.addColorStop(0, `rgba(37, 99, 235, ${opacity})`);
-    gradient.addColorStop(1, `rgba(14, 165, 233, ${opacity})`);
-    blueGradients.push(gradient);
+// Função para inicializar gráfico com verificações de segurança
+function initChart() {
+  const ctx = document.getElementById('chartCursos');
+  if (!ctx) {
+    console.warn('Elemento canvas do gráfico não encontrado');
+    return;
   }
-  
-  // Dados do gráfico
-  const chartData = {
-    labels: cursosNomes,
-    datasets: [{
-      label: 'Alunos matriculados',
-      data: alunosQtd,
-      backgroundColor: blueGradients,
-      borderColor: 'rgba(37, 99, 235, 0.8)',
-      borderWidth: 1,
-      borderRadius: 6,
-      borderSkipped: false,
-    }]
-  };
-  
-  // Configurações do gráfico
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: false
-      },
-      tooltip: {
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        titleColor: '#1e293b',
-        bodyColor: '#64748b',
-        borderColor: 'rgba(37, 99, 235, 0.2)',
-        borderWidth: 1,
-        cornerRadius: 8,
-        padding: 12,
-        boxPadding: 6,
-        callbacks: {
-          label: function(context) {
-            return `Alunos: ${context.parsed.y}`;
-          }
-        }
-      }
-    },
-    scales: {
-      x: {
-        grid: {
-          color: 'rgba(226, 232, 240, 0.5)',
-          drawBorder: false
-        },
-        ticks: {
-          color: '#64748b',
-          font: {
-            size: 12,
-            family: "'Inter', sans-serif"
-          }
-        }
-      },
-      y: {
-        beginAtZero: true,
-        grid: {
-          color: 'rgba(226, 232, 240, 0.5)',
-          drawBorder: false
-        },
-        ticks: {
-          color: '#64748b',
-          font: {
-            size: 12,
-            family: "'Inter', sans-serif"
-          },
-          callback: function(value) {
-            return value;
-          }
-        }
-      }
-    },
-    animation: {
-      duration: 2000,
-      easing: 'easeOutQuart'
+
+  // Verificar se Chart.js está carregado
+  if (typeof Chart === 'undefined') {
+    console.error('Chart.js não está carregado');
+    return;
+  }
+
+  // Verificar se já existe um gráfico neste canvas
+  if (ctx.chart) {
+    ctx.chart.destroy();
+  }
+
+  // Configurar gráfico se houver cursos e dados válidos
+  if (cursosNomes && cursosNomes.length > 0 && alunosQtd && alunosQtd.length > 0 && cursosNomes.length === alunosQtd.length) {
+    const context = ctx.getContext('2d');
+
+    // Cores em gradiente azul
+    const blueGradients = [];
+    for (let i = 0; i < cursosNomes.length; i++) {
+      const gradient = context.createLinearGradient(0, 0, 0, 400);
+      const opacity = Math.min(0.7 + (i * 0.1), 1.0); // Limitar opacity máximo
+      gradient.addColorStop(0, `rgba(37, 99, 235, ${opacity})`);
+      gradient.addColorStop(1, `rgba(14, 165, 233, ${opacity})`);
+      blueGradients.push(gradient);
     }
-  };
-  
-  // Criar gráfico
-  new Chart(ctx, {
-    type: 'bar',
-    data: chartData,
-    options: chartOptions
-  });
-} else {
-  // Se não houver cursos, esconder o gráfico
-  document.querySelector('.chart-container').innerHTML = `
-    <div class="empty-state" style="height: 250px; border: none;">
-      <div class="empty-icon">
-        <i class="fas fa-chart-bar"></i>
-      </div>
-      <h3 style="margin-bottom: 0.5rem;">Sem dados para exibir</h3>
-      <p style="color: var(--text-secondary);">Crie seu primeiro curso para visualizar estatísticas.</p>
-    </div>
-  `;
+
+    // Dados do gráfico
+    const chartData = {
+      labels: cursosNomes,
+      datasets: [{
+        label: 'Alunos matriculados',
+        data: alunosQtd,
+        backgroundColor: blueGradients,
+        borderColor: 'rgba(37, 99, 235, 0.8)',
+        borderWidth: 1,
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    };
+
+    // Configurações do gráfico
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          titleColor: '#1e293b',
+          bodyColor: '#64748b',
+          borderColor: 'rgba(37, 99, 235, 0.2)',
+          borderWidth: 1,
+          cornerRadius: 8,
+          padding: 12,
+          boxPadding: 6,
+          callbacks: {
+            label: function(context) {
+              return `Alunos: ${context.parsed.y}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: {
+            color: 'rgba(226, 232, 240, 0.5)',
+            drawBorder: false
+          },
+          ticks: {
+            color: '#64748b',
+            font: {
+              size: 12,
+              family: "'Inter', sans-serif"
+            }
+          }
+        },
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(226, 232, 240, 0.5)',
+            drawBorder: false
+          },
+          ticks: {
+            color: '#64748b',
+            font: {
+              size: 12,
+              family: "'Inter', sans-serif"
+            },
+            callback: function(value) {
+              return value;
+            }
+          }
+        }
+      },
+      animation: {
+        duration: 2000,
+        easing: 'easeOutQuart'
+      }
+    };
+
+    // Criar gráfico
+    ctx.chart = new Chart(context, {
+      type: 'bar',
+      data: chartData,
+      options: chartOptions
+    });
+  } else {
+    // Se não houver cursos ou dados inválidos, mostrar estado vazio
+    const chartContainer = document.querySelector('.chart-container');
+    if (chartContainer) {
+      chartContainer.innerHTML = `
+        <div class="empty-state" style="height: 250px; border: none;">
+          <div class="empty-icon">
+            <i class="fas fa-chart-bar"></i>
+          </div>
+          <h4>Nenhum dado disponível</h4>
+          <p>Crie cursos para visualizar estatísticas de alunos.</p>
+        </div>
+      `;
+    }
+  }
 }
 
-// Efeito de clique nos botões do gráfico
-document.querySelectorAll('.chart-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
+// Inicializar gráfico quando DOM estiver pronto
+document.addEventListener('DOMContentLoaded', function() {
+  initChart();
+});
     document.querySelectorAll('.chart-btn').forEach(b => {
       b.style.background = 'var(--surface-dark)';
       b.style.color = 'var(--text-secondary)';

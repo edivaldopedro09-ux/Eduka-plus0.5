@@ -22,19 +22,19 @@ if(isset($_GET['aula_id']) && is_numeric($_GET['aula_id'])){
     $stmt2 = $conn->prepare("SELECT curso_id FROM aulas WHERE id=?");
     $stmt2->bind_param("i", $aula_id);
     $stmt2->execute();
-    $curso_id = $stmt2->get_result()->fetch_assoc()['curso_id'];
+    $curso_id = $stmt2->get_result()->fetch_assoc()['curso_id'] ?? null;
 
     // Total de aulas do curso
     $stmt3 = $conn->prepare("SELECT COUNT(*) AS total FROM aulas WHERE curso_id=?");
     $stmt3->bind_param("i", $curso_id);
     $stmt3->execute();
-    $total_aulas = $stmt3->get_result()->fetch_assoc()['total'];
+    $total_aulas = $stmt3->get_result()->fetch_assoc()['total'] ?? 0;
 
     // Aulas concluídas pelo aluno
     $stmt4 = $conn->prepare("SELECT COUNT(*) AS concluidas FROM progresso p INNER JOIN aulas a ON p.aula_id=a.id WHERE p.aluno_id=? AND a.curso_id=? AND p.concluido=1");
     $stmt4->bind_param("ii", $aluno_id, $curso_id);
     $stmt4->execute();
-    $aulas_concluidas = $stmt4->get_result()->fetch_assoc()['concluidas'];
+    $aulas_concluidas = $stmt4->get_result()->fetch_assoc()['concluidas'] ?? 0;
 
     // Marcar curso como concluído se todas aulas finalizadas
     if($total_aulas > 0 && $aulas_concluidas >= $total_aulas){
